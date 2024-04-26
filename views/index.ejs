@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <title>OAuth Example</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+    }
+    .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    .welcome {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .welcome h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    .welcome p {
+        font-size: 16px;
+        color: #666;
+    }
+    .logout-btn {
+        background-color: #ff4d4d;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .logout-btn:hover {
+        background-color: #ff6666;
+    }
+    ul {
+        list-style-type: none;
+        padding: 0;
+        text-align: center;
+    }
+    li {
+        margin-bottom: 10px;
+    }
+    li button {
+        background-color: #ff4d4d;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    li button:hover {
+        background-color: #ff6666;
+    }
+
+    .user-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.user-email {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.delete-btn {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #ff6666;
+}
+    .social-icons {
+    text-align: center;
+    margin-bottom: 20px;
+    }
+
+    .social-icons .icon-link {
+    display: inline-block;
+    margin: 0 10px;
+    font-size: 24px;
+    color: #666;
+    }
+
+    .social-icons .icon-link:hover {
+    color: #000;
+    }
+</style>
+</head>
+<body>
+    <% if (token) { %>
+      <div class="container">
+        <div class="welcome">
+          <h2>Welcome</h2>
+          <p>You are logged in. Welcome to our user list page.</p>
+          <div class="social-icons">
+              <a href="https://github.com/kaankulac" target="_blank" class="icon-link"><i class="fab fa-github"></i></a>
+              <a href="https://linkedin.com/in/kaankulac" target="_blank" class="icon-link"><i class="fab fa-linkedin"></i></a>
+          </div>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+        <h2>Users</h2>
+        <ul id="userList" class="user-list">
+          <% users.forEach(function(user) { %>
+              <li class="user-item">
+                  <span class="user-email"><%= user.email %></span>
+                  <button class="delete-btn" onclick="deleteUser('<%= user.user_id %>')">Sil</button>
+              </li>
+          <% }); %>
+      </ul>
+    </div>
+
+    <% } else { %>
+      <h1> OAuth Example </h1>
+      <button onclick="googleOAuth()">Google Auth</button>
+    <% } %>
+</body>
+<script>
+    async function googleOAuth() { 
+      let data = await fetch('http://localhost:3000/oauth/google/request', {method: 'POST', credentials: 'include'})
+      const response = await data.json();
+
+      window.location.href = response.url
+    }
+
+    async function deleteUser(id) {
+      let response = await fetch(`http://localhost:3000/users/${id}`, {method: 'DELETE', credentials: 'include'});
+      if (response.ok) {
+        window.location.reload();
+      }
+    }
+
+    async function logout() { 
+      let response = await fetch('http://localhost:3000/logout', {method: 'POST', credentials: 'include'});
+      if (response.ok) {
+        window.location.href = '/home';
+      }
+    }
+</script>
+</html>
